@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/Muto1907/PokeDex/cmd"
 )
 
 func cleanInput(text string) []string {
@@ -22,6 +24,13 @@ func StartREPL() {
 			continue
 		}
 		word := cleanedInput[0]
-		fmt.Printf("Your command was: %s\n", word)
+		if cmd, ok := cmd.GetCommands()[word]; ok {
+			err := cmd.Callback()
+			if err != nil {
+				fmt.Printf("Error: %v\n", err)
+			}
+		} else {
+			fmt.Println("Unknown command")
+		}
 	}
 }
