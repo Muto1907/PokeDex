@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"github.com/Muto1907/PokeDex/repl"
 )
 
 func main() {
-	fmt.Println("Hello, World!")
+	repl.StartREPL()
 }
