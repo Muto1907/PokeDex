@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/Muto1907/PokeDex/cmd"
+	"github.com/Muto1907/PokeDex/internal"
 )
 
 func cleanInput(text string) []string {
@@ -16,6 +17,10 @@ func cleanInput(text string) []string {
 
 func StartREPL() {
 	scanner := bufio.NewScanner(os.Stdin)
+	config := &internal.Config{
+		Next:     "https://pokeapi.co/api/v2/location-area/",
+		Previous: nil,
+	}
 	for {
 		fmt.Print("Pokedex >")
 		scanner.Scan()
@@ -25,7 +30,7 @@ func StartREPL() {
 		}
 		word := cleanedInput[0]
 		if cmd, ok := cmd.GetCommands()[word]; ok {
-			err := cmd.Callback()
+			err := cmd.Callback(config)
 			if err != nil {
 				fmt.Printf("Error: %v\n", err)
 			}
