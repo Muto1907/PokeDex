@@ -1,10 +1,7 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 
 	internal "github.com/Muto1907/PokeDex/internal"
@@ -26,32 +23,14 @@ func CommandHelp(conf *internal.Config) error {
 }
 
 func CommandMap(conf *internal.Config) error {
-	body, ok := conf.Cache.Get(conf.Next)
-	if !ok {
-		res, err := http.Get(conf.Next)
-		if err != nil {
-			return err
-		}
-		body, err = io.ReadAll(res.Body)
-		defer res.Body.Close()
-		if res.StatusCode > 299 {
-			return fmt.Errorf("response failed with status code: %d and \n body: %s", res.StatusCode, body)
-		}
-		if err != nil {
-			return err
-		}
-		conf.Cache.Add(conf.Next, body)
-	}
-
-	location := internal.Location{}
-	err := json.Unmarshal(body, &location)
+	location, err := conf.Client.Request_locations(conf.Next)
 	if err != nil {
 		return err
 	}
 	for _, loc := range location.Results {
 		fmt.Printf("%s\n", loc.Name)
 	}
-	conf.Next = *location.Next
+	conf.Next = location.Next
 	conf.Previous = location.Previous
 	return nil
 }
@@ -61,32 +40,14 @@ func CommandMapB(conf *internal.Config) error {
 		fmt.Println("you're on the first page")
 		return nil
 	}
-	body, ok := conf.Cache.Get(*conf.Previous)
-	if !ok {
-		res, err := http.Get(*conf.Previous)
-		if err != nil {
-			return err
-		}
-		body, err = io.ReadAll(res.Body)
-		defer res.Body.Close()
-		if res.StatusCode > 299 {
-			return fmt.Errorf("response failed with status code: %d and \n body: %s", res.StatusCode, body)
-		}
-		if err != nil {
-			return err
-		}
-		conf.Cache.Add(*conf.Previous, body)
-	}
-
-	var locations internal.Location
-	err := json.Unmarshal(body, &locations)
+	locations, err := conf.Client.Request_locations(conf.Previous)
 	if err != nil {
 		return err
 	}
 	for _, location := range locations.Results {
 		fmt.Printf("%s\n", location.Name)
 	}
-	conf.Next = *locations.Next
+	conf.Next = locations.Next
 	conf.Previous = locations.Previous
 	return nil
 }
