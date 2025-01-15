@@ -17,7 +17,7 @@ func cleanInput(text string) []string {
 
 func StartREPL(config *internal.Config) {
 	scanner := bufio.NewScanner(os.Stdin)
-
+	var err error
 	for {
 		fmt.Print("Pokedex >")
 		scanner.Scan()
@@ -27,7 +27,11 @@ func StartREPL(config *internal.Config) {
 		}
 		word := cleanedInput[0]
 		if cmd, ok := cmd.GetCommands()[word]; ok {
-			err := cmd.Callback(config)
+			if len(cleanedInput) >= 2 {
+				err = cmd.Callback(config, cleanedInput[1])
+			} else {
+				err = cmd.Callback(config, "")
+			}
 			if err != nil {
 				fmt.Printf("Error: %v\n", err)
 			}

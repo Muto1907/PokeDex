@@ -7,13 +7,13 @@ import (
 	internal "github.com/Muto1907/PokeDex/internal"
 )
 
-func CommandExit(conf *internal.Config) error {
+func CommandExit(conf *internal.Config, area string) error {
 	fmt.Println("Closing the PokeDex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func CommandHelp(conf *internal.Config) error {
+func CommandHelp(conf *internal.Config, area string) error {
 	fmt.Print("Welcome to the Pokedex!\nUsage:\n\n")
 	for _, cmd := range GetCommands() {
 		fmt.Printf("%s: %s\n", cmd.Name, cmd.Description)
@@ -22,7 +22,7 @@ func CommandHelp(conf *internal.Config) error {
 	return nil
 }
 
-func CommandMap(conf *internal.Config) error {
+func CommandMap(conf *internal.Config, area string) error {
 	location, err := conf.Client.Request_locations(conf.Next)
 	if err != nil {
 		return err
@@ -35,7 +35,7 @@ func CommandMap(conf *internal.Config) error {
 	return nil
 }
 
-func CommandMapB(conf *internal.Config) error {
+func CommandMapB(conf *internal.Config, area string) error {
 	if conf.Previous == nil {
 		fmt.Println("you're on the first page")
 		return nil
@@ -52,10 +52,31 @@ func CommandMapB(conf *internal.Config) error {
 	return nil
 }
 
+func CommandExplore(conf *internal.Config, area string) error {
+	if area == "" {
+		return fmt.Errorf("please enter a correct location")
+	}
+	fmt.Printf("Exploring %s...\n", area)
+	location, err := conf.Client.Request_location_area(area)
+	if err != nil {
+		return err
+	}
+	pokemons := internal.Get_pokemon_names_from_location_area(location)
+	if len(pokemons) > 0 {
+		fmt.Println("Found Pokemon:")
+		for _, name := range pokemons {
+			fmt.Printf("- %s\n", name)
+		}
+	} else {
+		fmt.Printf("No Pokemon found for %s\n", area)
+	}
+	return nil
+}
+
 type CliCommand struct {
 	Name        string
 	Description string
-	Callback    func(conf *internal.Config) error
+	Callback    func(conf *internal.Config, area string) error
 }
 
 func GetCommands() map[string]CliCommand {
@@ -79,6 +100,11 @@ func GetCommands() map[string]CliCommand {
 			Name:        "mapb",
 			Description: "Displays the 20 previous visited location areas in the Pokemon world",
 			Callback:    CommandMapB,
+		},
+		"explore": {
+			Name:        "explore",
+			Description: "Displays the available Pokemon inside a location Usage: explore <insert location  here>",
+			Callback:    CommandExplore,
 		},
 	}
 }
