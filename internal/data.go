@@ -1,5 +1,7 @@
 package internal
 
+import "github.com/Muto1907/PokeDex/internal/pokecache"
+
 type Location struct {
 	Count    int     `json:"count"`
 	Next     *string `json:"next"`
@@ -13,4 +15,5 @@ type Location struct {
 type Config struct {
 	Next     string
 	Previous *string
+	Cache    *pokecache.Cache
 }

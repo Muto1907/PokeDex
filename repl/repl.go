@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/Muto1907/PokeDex/cmd"
 	"github.com/Muto1907/PokeDex/internal"
+	"github.com/Muto1907/PokeDex/internal/pokecache"
 )
 
 func cleanInput(text string) []string {
@@ -20,6 +22,7 @@ func StartREPL() {
 	config := &internal.Config{
 		Next:     "https://pokeapi.co/api/v2/location-area/",
 		Previous: nil,
+		Cache:    pokecache.NewCache(5 * time.Second),
 	}
 	for {
 		fmt.Print("Pokedex >")

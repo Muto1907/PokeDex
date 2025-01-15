@@ -26,21 +26,25 @@ func CommandHelp(conf *internal.Config) error {
 }
 
 func CommandMap(conf *internal.Config) error {
+	body, ok := conf.Cache.Get(conf.Next)
+	if !ok {
+		res, err := http.Get(conf.Next)
+		if err != nil {
+			return err
+		}
+		body, err = io.ReadAll(res.Body)
+		defer res.Body.Close()
+		if res.StatusCode > 299 {
+			return fmt.Errorf("response failed with status code: %d and \n body: %s", res.StatusCode, body)
+		}
+		if err != nil {
+			return err
+		}
+		conf.Cache.Add(conf.Next, body)
+	}
 
-	res, err := http.Get(conf.Next)
-	if err != nil {
-		return err
-	}
-	body, err := io.ReadAll(res.Body)
-	defer res.Body.Close()
-	if res.StatusCode > 299 {
-		return fmt.Errorf("response failed with status code: %d and \n body: %s", res.StatusCode, body)
-	}
-	if err != nil {
-		return err
-	}
 	location := internal.Location{}
-	err = json.Unmarshal(body, &location)
+	err := json.Unmarshal(body, &location)
 	if err != nil {
 		return err
 	}
@@ -57,20 +61,25 @@ func CommandMapB(conf *internal.Config) error {
 		fmt.Println("you're on the first page")
 		return nil
 	}
-	res, err := http.Get(*conf.Previous)
-	if err != nil {
-		return err
+	body, ok := conf.Cache.Get(*conf.Previous)
+	if !ok {
+		res, err := http.Get(*conf.Previous)
+		if err != nil {
+			return err
+		}
+		body, err = io.ReadAll(res.Body)
+		defer res.Body.Close()
+		if res.StatusCode > 299 {
+			return fmt.Errorf("response failed with status code: %d and \n body: %s", res.StatusCode, body)
+		}
+		if err != nil {
+			return err
+		}
+		conf.Cache.Add(*conf.Previous, body)
 	}
-	body, err := io.ReadAll(res.Body)
-	defer res.Body.Close()
-	if res.StatusCode > 299 {
-		return fmt.Errorf("response failed with status code: %d and \n body: %s", res.StatusCode, body)
-	}
-	if err != nil {
-		return err
-	}
+
 	var locations internal.Location
-	err = json.Unmarshal(body, &locations)
+	err := json.Unmarshal(body, &locations)
 	if err != nil {
 		return err
 	}
