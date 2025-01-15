@@ -34,7 +34,7 @@ func CommandMap(conf *internal.Config) error {
 	body, err := io.ReadAll(res.Body)
 	defer res.Body.Close()
 	if res.StatusCode > 299 {
-		return fmt.Errorf("Response failed with status code: %d and \n body: %s", res.StatusCode, body)
+		return fmt.Errorf("response failed with status code: %d and \n body: %s", res.StatusCode, body)
 	}
 	if err != nil {
 		return err
@@ -64,7 +64,7 @@ func CommandMapB(conf *internal.Config) error {
 	body, err := io.ReadAll(res.Body)
 	defer res.Body.Close()
 	if res.StatusCode > 299 {
-		return fmt.Errorf("Response failed with status code: %d and \n body: %s", res.StatusCode, body)
+		return fmt.Errorf("response failed with status code: %d and \n body: %s", res.StatusCode, body)
 	}
 	if err != nil {
 		return err
