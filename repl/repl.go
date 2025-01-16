@@ -28,7 +28,8 @@ func StartREPL(config *internal.Config) {
 		word := cleanedInput[0]
 		if cmd, ok := cmd.GetCommands()[word]; ok {
 			if len(cleanedInput) >= 2 {
-				err = cmd.Callback(config, cleanedInput[1])
+				args := cleanedInput[1:]
+				err = cmd.Callback(config, args...)
 			} else {
 				err = cmd.Callback(config, "")
 			}

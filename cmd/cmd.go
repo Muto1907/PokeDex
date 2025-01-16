@@ -7,13 +7,13 @@ import (
 	internal "github.com/Muto1907/PokeDex/internal"
 )
 
-func CommandExit(conf *internal.Config, area string) error {
+func CommandExit(conf *internal.Config, args ...string) error {
 	fmt.Println("Closing the PokeDex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func CommandHelp(conf *internal.Config, area string) error {
+func CommandHelp(conf *internal.Config, args ...string) error {
 	fmt.Print("Welcome to the Pokedex!\nUsage:\n\n")
 	for _, cmd := range GetCommands() {
 		fmt.Printf("%s: %s\n", cmd.Name, cmd.Description)
@@ -22,7 +22,7 @@ func CommandHelp(conf *internal.Config, area string) error {
 	return nil
 }
 
-func CommandMap(conf *internal.Config, area string) error {
+func CommandMap(conf *internal.Config, args ...string) error {
 	location, err := conf.Client.Request_locations(conf.Next)
 	if err != nil {
 		return err
@@ -35,7 +35,7 @@ func CommandMap(conf *internal.Config, area string) error {
 	return nil
 }
 
-func CommandMapB(conf *internal.Config, area string) error {
+func CommandMapB(conf *internal.Config, args ...string) error {
 	if conf.Previous == nil {
 		fmt.Println("you're on the first page")
 		return nil
@@ -52,12 +52,12 @@ func CommandMapB(conf *internal.Config, area string) error {
 	return nil
 }
 
-func CommandExplore(conf *internal.Config, area string) error {
-	if area == "" {
+func CommandExplore(conf *internal.Config, args ...string) error {
+	if args[0] == "" {
 		return fmt.Errorf("please enter a correct location")
 	}
-	fmt.Printf("Exploring %s...\n", area)
-	location, err := conf.Client.Request_location_area(area)
+	fmt.Printf("Exploring %s...\n", args[0])
+	location, err := conf.Client.Request_location_area(args[0])
 	if err != nil {
 		return err
 	}
@@ -68,15 +68,24 @@ func CommandExplore(conf *internal.Config, area string) error {
 			fmt.Printf("- %s\n", name)
 		}
 	} else {
-		fmt.Printf("No Pokemon found for %s\n", area)
+		fmt.Printf("No Pokemon found for %s\n", args[0])
 	}
+	return nil
+}
+
+func CommandCatch(conf *internal.Config, args ...string) error {
+	pokemon, err := conf.Client.Request_pokemon(args[0])
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokemon.Name)
 	return nil
 }
 
 type CliCommand struct {
 	Name        string
 	Description string
-	Callback    func(conf *internal.Config, area string) error
+	Callback    func(conf *internal.Config, args ...string) error
 }
 
 func GetCommands() map[string]CliCommand {
@@ -105,6 +114,11 @@ func GetCommands() map[string]CliCommand {
 			Name:        "explore",
 			Description: "Displays the available Pokemon inside a location Usage: explore <insert location  here>",
 			Callback:    CommandExplore,
+		},
+		"catch": {
+			Name:        "catch <Pokemon>",
+			Description: "Try to catch a Pokemon",
+			Callback:    CommandCatch,
 		},
 	}
 }
