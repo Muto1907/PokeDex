@@ -90,6 +90,26 @@ func CommandCatch(conf *internal.Config, args ...string) error {
 	return nil
 }
 
+func CommandInspect(conf *internal.Config, args ...string) error {
+	pokemon, ok := conf.PokeDex[args[0]]
+	if !ok {
+		fmt.Println("you have not caught that pokemon")
+		return nil
+	}
+	fmt.Printf("Name: %s\n", pokemon.Name)
+	fmt.Printf("Height: %d\n", pokemon.Height)
+	fmt.Printf("Weight: %d\n", pokemon.Weight)
+	fmt.Println("Stats:")
+	for _, stat := range pokemon.Stats {
+		fmt.Printf("  -%s: %d\n", stat.Stat.Name, stat.BaseStat)
+	}
+	fmt.Println("Types:")
+	for _, typee := range pokemon.Types {
+		fmt.Printf("  - %s\n", typee.Type.Name)
+	}
+	return nil
+}
+
 type CliCommand struct {
 	Name        string
 	Description string
@@ -127,6 +147,11 @@ func GetCommands() map[string]CliCommand {
 			Name:        "catch <Pokemon>",
 			Description: "Try to catch a Pokemon",
 			Callback:    CommandCatch,
+		},
+		"inspect": {
+			Name:        "inspect <Pokemon>",
+			Description: "Lookup all your caught Pokemon in your Pokedex",
+			Callback:    CommandInspect,
 		},
 	}
 }
