@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 
 	internal "github.com/Muto1907/PokeDex/internal"
@@ -79,6 +80,13 @@ func CommandCatch(conf *internal.Config, args ...string) error {
 		return err
 	}
 	fmt.Printf("Throwing a Pokeball at %s...\n", pokemon.Name)
+	catch_chance := rand.Float64()
+	if catch_chance > 1-(100/float64(pokemon.BaseExperience)) {
+		fmt.Printf("%s was caught!\n", pokemon.Name)
+		conf.PokeDex[pokemon.Name] = pokemon
+	} else {
+		fmt.Printf("%s escaped!\n", pokemon.Name)
+	}
 	return nil
 }
 

@@ -67,6 +67,7 @@ type Config struct {
 	Next     *string
 	Previous *string
 	Client   Client
+	PokeDex  map[string]Pokemon
 }
 
 type Pokemon struct {

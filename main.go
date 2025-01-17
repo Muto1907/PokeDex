@@ -12,6 +12,7 @@ func main() {
 		Next:     nil,
 		Previous: nil,
 		Client:   internal.NewClient(5*time.Minute, 5*time.Second),
+		PokeDex:  make(map[string]internal.Pokemon),
 	}
 	repl.StartREPL(config)
 }
