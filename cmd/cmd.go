@@ -80,8 +80,8 @@ func CommandCatch(conf *internal.Config, args ...string) error {
 		return err
 	}
 	fmt.Printf("Throwing a Pokeball at %s...\n", pokemon.Name)
-	catch_chance := rand.Float64()
-	if catch_chance > 1-(100/float64(pokemon.BaseExperience)) {
+	catch_chance := rand.Intn(pokemon.BaseExperience)
+	if catch_chance < 50 {
 		conf.PokeDex[pokemon.Name] = pokemon
 		fmt.Printf("%s was caught!\n", pokemon.Name)
 		fmt.Println("You may now inspect it with the inspect command.")
