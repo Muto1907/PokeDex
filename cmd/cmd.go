@@ -82,8 +82,9 @@ func CommandCatch(conf *internal.Config, args ...string) error {
 	fmt.Printf("Throwing a Pokeball at %s...\n", pokemon.Name)
 	catch_chance := rand.Float64()
 	if catch_chance > 1-(100/float64(pokemon.BaseExperience)) {
-		fmt.Printf("%s was caught!\n", pokemon.Name)
 		conf.PokeDex[pokemon.Name] = pokemon
+		fmt.Printf("%s was caught!\n", pokemon.Name)
+		fmt.Println("You may now inspect it with the inspect command.")
 	} else {
 		fmt.Printf("%s escaped!\n", pokemon.Name)
 	}
@@ -101,11 +102,19 @@ func CommandInspect(conf *internal.Config, args ...string) error {
 	fmt.Printf("Weight: %d\n", pokemon.Weight)
 	fmt.Println("Stats:")
 	for _, stat := range pokemon.Stats {
-		fmt.Printf("  -%s: %d\n", stat.Stat.Name, stat.BaseStat)
+		fmt.Printf("  - %s: %d\n", stat.Stat.Name, stat.BaseStat)
 	}
 	fmt.Println("Types:")
 	for _, typee := range pokemon.Types {
 		fmt.Printf("  - %s\n", typee.Type.Name)
+	}
+	return nil
+}
+
+func CommandPokedex(conf *internal.Config, args ...string) error {
+	fmt.Println("Your Pokedex:")
+	for key := range conf.PokeDex {
+		fmt.Printf("  - %s\n", key)
 	}
 	return nil
 }
@@ -152,6 +161,11 @@ func GetCommands() map[string]CliCommand {
 			Name:        "inspect <Pokemon>",
 			Description: "Lookup all your caught Pokemon in your Pokedex",
 			Callback:    CommandInspect,
+		},
+		"pokedex": {
+			Name:        "pokedex",
+			Description: "List the names of all your caught Pokemon",
+			Callback:    CommandPokedex,
 		},
 	}
 }
